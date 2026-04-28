@@ -30,13 +30,14 @@
 本项目采用规格驱动开发，功能开发前先补齐规格文档。
 
 ```text
-需求规格 -> 技术设计 -> 任务拆分 -> 代码实现 -> 验证交付
+PRD 产品基线 -> SDD 需求规格 -> 技术设计 -> 任务拆分 -> 代码实现 -> 验证交付
 ```
 
 主要文档：
 
 - [项目协作规范](AGENTS.md)
 - [文档索引](docs/README.md)
+- [产品需求文档 PRD](docs/prd.md)
 - [SDD 工作流](docs/sdd/README.md)
 - [API 网关需求规格](docs/specs/api-gateway/requirements.md)
 - [API 网关技术设计](docs/specs/api-gateway/design.md)
@@ -68,4 +69,3 @@ composer require predis/predis
 | v0.3 | 完成鉴权、限流、路由匹配和转发 |
 | v0.4 | 完成日志、健康检查和基础管理 API |
 | v1.0 | 补齐测试、部署说明和基础稳定性优化 |
-

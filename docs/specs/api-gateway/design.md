@@ -1,5 +1,20 @@
 # API 网关技术设计
 
+## 0. 设计基线
+
+本设计承接 [API 网关系统 PRD](../../prd.md) 和 [API 网关需求规格](requirements.md)，目标是支撑 MVP 主链路：应用接入、路由配置、签名鉴权、防重放、限流、请求转发、日志审计和健康检查。
+
+关键设计决策：
+
+| 编号 | 决策 | 覆盖需求 |
+| --- | --- | --- |
+| DD-001 | 使用 ThinkPHP 中间件串联网关主链路。 | FR-007 至 FR-014 |
+| DD-002 | 使用 HMAC-SHA256 实现调用方签名认证。 | FR-008 |
+| DD-003 | 使用 Redis 保存 nonce 和固定窗口限流计数。 | FR-009 至 FR-011 |
+| DD-004 | 使用 MySQL 保存应用、路由、限流策略和审计日志。 | FR-001 至 FR-006、FR-014 |
+| DD-005 | 管理接口和网关转发入口分离。 | FR-016、NFR-001 |
+| DD-006 | 上游转发必须设置超时、Header 过滤和上游地址约束。 | FR-012、FR-013、NFR-003 |
+
 ## 1. 总体设计
 
 系统采用 ThinkPHP 8 的 HTTP 请求生命周期，通过中间件组成网关处理链路：
@@ -16,16 +31,17 @@
 
 ## 2. 模块职责
 
-| 模块 | 职责 |
-| --- | --- |
-| AuthService | 解析 app_key、校验签名、校验时间戳和 nonce |
-| RateLimitService | 使用 Redis 判断请求是否超过限流阈值 |
-| RouteMatchService | 根据方法、路径、状态匹配路由 |
-| UpstreamClient | 转发 HTTP 请求到上游并处理超时 |
-| GatewayLogService | 记录请求日志、错误日志和耗时 |
-| AppService | 管理调用方应用和密钥 |
-| AdminRouteService | 管理路由配置 |
-| HealthService | 检查 MySQL、Redis 和应用状态 |
+| 模块 | 职责 | 覆盖需求 |
+| --- | --- | --- |
+| AuthService | 解析 app_key、校验签名、校验时间戳和 nonce | FR-008、FR-009 |
+| RateLimitService | 使用 Redis 判断请求是否超过限流阈值 | FR-010、FR-011 |
+| RouteMatchService | 根据方法、路径、状态和优先级匹配路由 | FR-007 |
+| UpstreamClient | 转发 HTTP 请求到上游并处理超时、失败和 Header 过滤 | FR-012、FR-013 |
+| GatewayLogService | 记录请求日志、错误日志、管理日志和耗时 | FR-014 |
+| AppService | 管理调用方应用、状态和密钥生命周期 | FR-001 至 FR-004 |
+| AdminRouteService | 管理路由配置和状态 | FR-005、FR-006 |
+| RateLimitPolicyService | 管理应用级和路由级限流策略 | FR-010、FR-011、FR-016 |
+| HealthService | 检查 MySQL、Redis 和应用状态 | FR-015 |
 
 ## 3. 请求处理链路
 
@@ -157,3 +173,15 @@ rate_limit:route:{app_key}:{route_id}:{yyyyMMddHHmm}
 | 日志写入影响性能 | 同步写库可能拖慢请求 | 后续可改为队列或异步日志 |
 | 固定窗口限流不够平滑 | 边界时刻可能出现突刺 | 后续升级滑动窗口或令牌桶 |
 
+## 10. 设计追踪矩阵
+
+| 需求 | 设计决策 | 主要模块 | 验证重点 |
+| --- | --- | --- | --- |
+| FR-001 至 FR-004 | DD-004、DD-005 | AppService | 密钥只返回一次、禁用后鉴权失败 |
+| FR-005 至 FR-007 | DD-004、DD-005 | AdminRouteService、RouteMatchService | 精确匹配、前缀匹配、优先级 |
+| FR-008、FR-009 | DD-001、DD-002、DD-003 | AuthService | 签名、时间戳、nonce 防重放 |
+| FR-010、FR-011 | DD-003、DD-004 | RateLimitService、RateLimitPolicyService | 应用级和路由级限流优先级 |
+| FR-012、FR-013 | DD-001、DD-006 | UpstreamClient | Header 过滤、超时、上游错误 |
+| FR-014 | DD-004 | GatewayLogService | trace_id、错误码、日志脱敏 |
+| FR-015 | DD-003、DD-004 | HealthService | MySQL 和 Redis 状态 |
+| FR-016、NFR-001 | DD-005 | 管理控制器和管理中间件 | 管理令牌、访问来源限制 |
