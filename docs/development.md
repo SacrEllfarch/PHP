@@ -10,15 +10,15 @@
 
 ## 2. 本地初始化建议
 
-如果当前目录尚未初始化 ThinkPHP 项目，可在安全目录中执行：
+当前仓库已经初始化 ThinkPHP 项目骨架，首次拉取后执行：
 
 ```bash
-composer create-project topthink/think api-gateway
-cd api-gateway
-composer require predis/predis
+composer install
+cp .env.example .env
+php think run
 ```
 
-如果已在本仓库初始化，请不要重复执行覆盖命令，优先检查已有 `composer.json`。
+不要在当前目录重复执行 `composer create-project`，避免覆盖已有 SDD 文档和业务代码。
 
 ## 3. 配置项建议
 
@@ -32,31 +32,63 @@ DATABASE_TYPE=mysql
 DATABASE_HOST=127.0.0.1
 DATABASE_PORT=3306
 DATABASE_NAME=api_gateway
-DATABASE_USER=root
-DATABASE_PASS=
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=
 
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 REDIS_PASSWORD=
-REDIS_DB=0
+REDIS_DATABASE=0
+REDIS_TIMEOUT=3.0
 
 GATEWAY_SIGNATURE_WINDOW=300
+GATEWAY_UPSTREAM_BASE_URL=http://127.0.0.1:9000
 GATEWAY_MAX_BODY_SIZE=1048576
 GATEWAY_UPSTREAM_CONNECT_TIMEOUT=3
 GATEWAY_UPSTREAM_READ_TIMEOUT=10
 GATEWAY_ADMIN_TOKEN=change-me
+GATEWAY_ALLOWED_UPSTREAM_HOSTS=localhost,127.0.0.1
+
+GATEWAY_CORS_ALLOWED_ORIGINS=*
+GATEWAY_CORS_ALLOWED_METHODS=GET,POST,PUT,PATCH,DELETE,OPTIONS
+GATEWAY_CORS_ALLOWED_HEADERS=Content-Type,Authorization,X-Requested-With,X-Trace-Id
+GATEWAY_CORS_EXPOSED_HEADERS=X-Trace-Id
+GATEWAY_CORS_MAX_AGE=86400
+GATEWAY_CORS_ALLOW_CREDENTIALS=false
 ```
 
 注意：真实 `.env` 不应提交到版本库。
 
-## 4. 分支和任务建议
+## 4. 最小 MVP 路由
+
+当前最小网关只保留三类入口：
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/health` | 返回应用健康状态。 |
+| ANY | `/gateway` | 代理到 `GATEWAY_UPSTREAM_BASE_URL` 根路径。 |
+| ANY | `/gateway/<path>` | 将 `<path>` 拼接到上游基础地址后转发。 |
+
+示例：`GET /gateway/users?id=1` 会转发到 `GATEWAY_UPSTREAM_BASE_URL/users?id=1`。
+
+## 5. 伪静态配置
+
+本地开发可直接使用 ThinkPHP 内置服务器：
+
+```bash
+php think run -H 0.0.0.0 -p 8000
+```
+
+Apache 使用 [public/.htaccess](../public/.htaccess)，Nginx 可参考 [public/nginx.conf.example](../public/nginx.conf.example)。生产环境的 Web 根目录必须指向 `public/`，避免暴露项目源码、`.env` 和运行时文件。
+
+## 6. 分支和任务建议
 
 - 每个 SDD 任务对应一个小分支或一次小提交。
 - 先实现主链路，再补管理体验和扩展能力。
 - 修改需求时先更新 `docs/specs/*/requirements.md`。
 - 修改数据库时同步更新迁移和 `docs/database.md`。
 
-## 5. 代码组织建议
+## 7. 代码组织建议
 
 ```text
 app/service/Gateway/GatewayService.php
@@ -69,7 +101,7 @@ app/middleware/RateLimitMiddleware.php
 app/middleware/TraceMiddleware.php
 ```
 
-## 6. 响应格式
+## 8. 响应格式
 
 成功响应：
 
@@ -93,7 +125,7 @@ app/middleware/TraceMiddleware.php
 }
 ```
 
-## 7. 测试建议
+## 9. 测试建议
 
 优先覆盖：
 
@@ -114,4 +146,3 @@ vendor/bin/phpunit
 ```
 
 具体命令以项目实际安装的依赖为准。
-

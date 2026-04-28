@@ -1,0 +1,32 @@
+{
+  "name": "api-gateway/simple-gateway",
+  "description": "基于 ThinkPHP 8 的简单 API 网关系统",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.0",
+    "guzzlehttp/guzzle": "^7.8",
+    "predis/predis": "^2.2",
+    "topthink/framework": "^8.0",
+    "topthink/think-orm": "^3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "topthink/think-installer": true
+    }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "@php think service:discover"
+    ]
+  }
+}
