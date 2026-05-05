@@ -137,9 +137,27 @@ curl http://127.0.0.1:8000/not-exists
 ```bash
 composer validate
 php think route:list
+composer test:smoke
 ```
 
-自动化测试用例尚未补齐，后续需要优先覆盖签名原文构造、签名校验、nonce 防重放、限流计数、路由匹配、上游超时和统一错误响应。
+自动化测试用例尚未补齐，后续需要优先覆盖签名原文构造、签名校验、nonce 防重放、限流计数、路由匹配、上游超时和统一错误响应。当前 MVP 已补充 `composer test:smoke` 冒烟测试，用于验证健康检查、代理转发、CORS、404 兜底和前端控制台可访问性。
+
+## MVP 前端控制台
+
+启动网关后可以打开：
+
+```text
+http://127.0.0.1:8000/dashboard.html
+```
+
+当前控制台支持：
+
+- 查看 `/health` 健康状态、依赖状态和 `trace_id`。
+- 通过 `/gateway/*` 发起代理请求调试。
+- 查看响应状态码、耗时、响应体和返回的 `X-Trace-Id`。
+- 查看 MVP 业务链路和本地验收清单。
+
+更多测试说明见 [测试与运行验收](docs/testing.md)。
 
 ## 部署入口
 

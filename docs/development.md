@@ -142,7 +142,24 @@ app/middleware/TraceMiddleware.php
 ```bash
 composer validate
 php think route:list
+composer test:smoke
 vendor/bin/phpunit
 ```
 
 具体命令以项目实际安装的依赖为准。
+
+## 10. MVP 前端控制台
+
+当前仓库提供一个无需构建工具的静态控制台：
+
+```text
+public/dashboard.html
+```
+
+启动网关后访问：
+
+```text
+http://127.0.0.1:8000/dashboard.html
+```
+
+该页面用于本地联调和演示，支持查看健康状态、发起 `/gateway/*` 代理请求、查看响应耗时和 `X-Trace-Id`。正式管理后台仍应按 SDD 规格在管理 API、鉴权和权限模型补齐后再扩展。

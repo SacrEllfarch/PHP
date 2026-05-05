@@ -12,6 +12,7 @@ docs/
   architecture-diagram.md
   database.md
   development.md
+  testing.md
   security.md
   sdd/
     README.md
@@ -41,6 +42,7 @@ docs/
 10. [数据库设计](database.md)
 11. [安全设计](security.md)
 12. [开发指南](development.md)
+13. [测试与运行验收](testing.md)
 
 ## 维护规则
 

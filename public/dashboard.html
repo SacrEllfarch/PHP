@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API 网关 MVP 控制台</title>
+  <link rel="stylesheet" href="/assets/gateway-dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">ThinkPHP 8 / API Gateway MVP</p>
+        <h1>API 网关 MVP 控制台</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="refreshHealth" type="button">刷新健康状态</button>
+        <a class="ghost-link" href="/health" target="_blank" rel="noreferrer">打开 /health</a>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel status-panel" aria-labelledby="status-title">
+        <div class="section-title">
+          <span class="status-dot" id="healthDot"></span>
+          <div>
+            <h2 id="status-title">运行状态</h2>
+            <p id="healthSummary">等待检测</p>
+          </div>
+        </div>
+        <dl class="metric-grid">
+          <div>
+            <dt>服务</dt>
+            <dd id="serviceName">-</dd>
+          </div>
+          <div>
+            <dt>MySQL</dt>
+            <dd id="mysqlStatus">-</dd>
+          </div>
+          <div>
+            <dt>Redis</dt>
+            <dd id="redisStatus">-</dd>
+          </div>
+          <div>
+            <dt>Trace ID</dt>
+            <dd id="traceId">-</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="panel" aria-labelledby="request-title">
+        <div class="section-title">
+          <div>
+            <h2 id="request-title">代理请求调试</h2>
+            <p>通过当前网关调用本地上游示例。</p>
+          </div>
+        </div>
+        <form id="requestForm" class="request-form">
+          <label>
+            方法
+            <select id="requestMethod">
+              <option>GET</option>
+              <option>POST</option>
+              <option>PUT</option>
+              <option>PATCH</option>
+              <option>DELETE</option>
+            </select>
+          </label>
+          <label class="path-field">
+            网关路径
+            <input id="requestPath" value="/gateway/hello.json" autocomplete="off">
+          </label>
+          <label class="body-field">
+            请求体 JSON
+            <textarea id="requestBody" rows="5" placeholder='{"name":"demo"}'></textarea>
+          </label>
+          <button type="submit">发送请求</button>
+        </form>
+      </section>
+
+      <section class="panel response-panel" aria-labelledby="response-title">
+        <div class="section-title">
+          <div>
+            <h2 id="response-title">响应结果</h2>
+            <p id="responseMeta">尚未发送请求</p>
+          </div>
+        </div>
+        <pre id="responseBody">等待请求...</pre>
+      </section>
+
+      <section class="panel" aria-labelledby="logic-title">
+        <div class="section-title">
+          <div>
+            <h2 id="logic-title">MVP 业务链路</h2>
+            <p>当前已落地链路与后续扩展边界。</p>
+          </div>
+        </div>
+        <ol class="flow-list">
+          <li><span>1</span>接收请求并生成或透传 X-Trace-Id</li>
+          <li><span>2</span>执行 CORS、访问日志和统一异常处理</li>
+          <li><span>3</span>按 /gateway/* 拼接上游基础地址</li>
+          <li><span>4</span>校验上游协议、Host 白名单和请求体大小</li>
+          <li><span>5</span>转发请求并透传允许的响应头</li>
+          <li><span>6</span>下一阶段接入鉴权、Redis 限流和 MySQL 路由表</li>
+        </ol>
+      </section>
+
+      <section class="panel" aria-labelledby="acceptance-title">
+        <div class="section-title">
+          <div>
+            <h2 id="acceptance-title">验收清单</h2>
+            <p>本地提交前优先确认这些命令。</p>
+          </div>
+        </div>
+        <ul class="check-list">
+          <li><code>composer validate</code></li>
+          <li><code>php think route:list</code></li>
+          <li><code>composer test:smoke</code></li>
+          <li><code>curl http://127.0.0.1:8000/health</code></li>
+          <li><code>curl http://127.0.0.1:8000/gateway/hello.json</code></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="/assets/gateway-dashboard.js"></script>
+</body>
+</html>

@@ -27,6 +27,7 @@
   "scripts": {
     "post-autoload-dump": [
       "@php think service:discover"
-    ]
+    ],
+    "test:smoke": "bash tests/smoke.sh"
   }
 }
