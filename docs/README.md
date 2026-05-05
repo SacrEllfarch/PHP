@@ -9,6 +9,7 @@ docs/
   README.md
   prd.md
   architecture.md
+  architecture-diagram.md
   database.md
   development.md
   security.md
@@ -36,9 +37,10 @@ docs/
 6. [BDD 行为规格](bdd/README.md)
 7. [API 网关 MVP 行为场景](bdd/api-gateway-mvp.md)
 8. [系统架构说明](architecture.md)
-9. [数据库设计](database.md)
-10. [安全设计](security.md)
-11. [开发指南](development.md)
+9. [API 网关框架图](architecture-diagram.md)
+10. [数据库设计](database.md)
+11. [安全设计](security.md)
+12. [开发指南](development.md)
 
 ## 维护规则
 

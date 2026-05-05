@@ -12,15 +12,17 @@ Controller -> Middleware -> Service -> Model/Repository -> MySQL/Redis/Upstream
 
 各层职责：
 
-| 层级 | 职责 |
-| --- | --- |
-| Controller | 接收请求、调用服务、返回统一响应 |
-| Middleware | TraceId、鉴权、限流、日志、跨域 |
-| Service | 业务规则、流程编排、策略判断 |
-| Model/Repository | 数据查询、持久化、事务边界 |
-| Infrastructure | Redis、HTTP 客户端、配置、日志 |
+| 层级               | 职责                   |
+| ---------------- | -------------------- |
+| Controller       | 接收请求、调用服务、返回统一响应     |
+| Middleware       | TraceId、鉴权、限流、日志、跨域  |
+| Service          | 业务规则、流程编排、策略判断       |
+| Model/Repository | 数据查询、持久化、事务边界        |
+| Infrastructure   | Redis、HTTP 客户端、配置、日志 |
 
 ## 2. 运行时上下文
+
+可视化框架图见 [API 网关框架图](architecture-diagram.md)。
 
 ```text
 调用方应用
@@ -46,15 +48,15 @@ Controller -> Middleware -> Service -> Model/Repository -> MySQL/Redis/Upstream
 
 ## 4. 模块划分
 
-| 模块 | 说明 |
-| --- | --- |
+| 模块   | 说明                          |
+| ---- | --------------------------- |
 | 应用管理 | 管理 app_key、app_secret、状态和备注 |
-| 路由管理 | 管理网关路径、上游地址、匹配类型、超时 |
-| 鉴权模块 | 验证身份、签名、时间戳和 nonce |
-| 限流模块 | Redis 计数和策略判断 |
-| 转发模块 | 构造上游请求、处理响应和异常 |
-| 日志模块 | 请求日志、错误日志、管理操作日志 |
-| 健康检查 | 检查应用、MySQL、Redis 依赖状态 |
+| 路由管理 | 管理网关路径、上游地址、匹配类型、超时         |
+| 鉴权模块 | 验证身份、签名、时间戳和 nonce          |
+| 限流模块 | Redis 计数和策略判断               |
+| 转发模块 | 构造上游请求、处理响应和异常              |
+| 日志模块 | 请求日志、错误日志、管理操作日志            |
+| 健康检查 | 检查应用、MySQL、Redis 依赖状态       |
 
 ## 5. 扩展点
 
@@ -71,4 +73,3 @@ Controller -> Middleware -> Service -> Model/Repository -> MySQL/Redis/Upstream
 - 配置变更后需要明确缓存刷新策略。
 - 所有跨系统请求必须有超时。
 - 网关错误响应不能泄露内部堆栈和上游敏感信息。
-
